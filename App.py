@@ -37,9 +37,36 @@ def addContact():
         flash('Contact Added')
         return redirect(url_for('Index'))
 
-@app.route('/edit')
-def editContact():
-    return 'Edit Contact'
+@app.route('/edit/<id>')
+def get_contact(id):
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM contacts WHERE idcontacts = {0}'.format(id))
+    data = cursor.fetchall()
+    return render_template('edit.html', contact = data[0])
+
+@app.route('/update/<id>', methods=['POST'])
+def updateContact(id):
+
+    if request.method == 'POST':
+
+        name = request.form['name']
+        phone = request.form['phone']
+        email = request.form['email']
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            UPDATE contacts
+            SET name = %s,
+                phone = %s,
+                email = %s
+            WHERE idcontacts = %s
+        """, (name, phone, email, id))
+
+        mysql.connection.commit()
+
+        flash('Contact Updated')
+        return redirect(url_for('Index'))
+
 
 @app.route('/delete/<string:id>')
 def deleteContact(id):
