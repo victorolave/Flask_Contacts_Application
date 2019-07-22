@@ -41,9 +41,15 @@ def addContact():
 def editContact():
     return 'Edit Contact'
 
-@app.route('/delete')
-def deleteContact():
-    return 'Delete Contact'
+@app.route('/delete/<string:id>')
+def deleteContact(id):
+    cursor = mysql.connection.cursor()
+    cursor.execute('DELETE FROM contacts WHERE idcontacts = {0}'.format(id))
+    mysql.connection.commit()
+
+    flash('Contact Deleted')
+    return redirect(url_for('Index'))
+    
 
 if __name__ == '__main__':
     app.run(port = 3000, debug = True)
